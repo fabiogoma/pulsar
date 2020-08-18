@@ -1,0 +1,12 @@
+---
+    - name: Validate communication with hosts
+      hosts: all
+      gather_facts: false
+    
+      tasks:
+        - name: Check communication with ping
+          ping:
+
+        - name: Check communication with debug
+          debug:
+            msg: "{{ inventory_hostname }}"

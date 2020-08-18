@@ -1,0 +1,59 @@
+---
+    - name: Setup zookeeper
+      template:
+        src: zookeeper.conf.j2
+        dest: /sn-platform-pulsar/etc/pulsar/zookeeper.conf
+        owner: pulsar
+        group: streamnative
+        mode: 0644
+
+    - name: Create data folder
+      file:
+        dest: /sn-platform-pulsar/data/zookeeper
+        owner: pulsar
+        group: streamnative
+        state: directory
+        recurse: true
+
+    - name: Create myid file
+      lineinfile:
+        path: /sn-platform-pulsar/data/zookeeper/myid
+        line: "{{ inventory_hostname.split('.')[0].split('-')[1] }}"
+        owner: pulsar
+        group: streamnative
+        create: true
+      register: systemd_update
+
+    - name: Update ExecStart on systemd file
+      lineinfile:
+        path: /sn-platform-pulsar/lib/systemd/system/zookeeper.service
+        regexp: '^ExecStart=/bin/pulsar zookeeper'
+        line: ExecStart=/sn-platform-pulsar/bin/pulsar zookeeper
+      register: systemd_update
+
+    - name: Add WorkingDirectory to systemd file
+      lineinfile:
+        path: /sn-platform-pulsar/lib/systemd/system/zookeeper.service
+        insertafter: '^Group=streamnative'
+        line: WorkingDirectory=/sn-platform-pulsar/bin
+      register: systemd_update
+    
+    - name: Create a symbolic link
+      file:
+        src: /sn-platform-pulsar/lib/systemd/system/zookeeper.service
+        dest: /etc/systemd/system/zookeeper.service
+        state: link
+      register: systemd_update
+    
+    - name: Restart service zookeeper, also issue daemon-reload to pick up config changes
+      systemd:
+        name: zookeeper
+        state: restarted
+        daemon_reload: yes
+      when: systemd_update.changed
+    
+    - name: Ensure zookeeper is running
+      systemd:
+        name: zookeeper
+        state: started
+        daemon_reload: yes

@@ -1,0 +1,10 @@
+---
+    - name: Zookeeper restart
+      hosts: zookeeper
+      gather_facts: false
+    
+      tasks:
+        - name: Zookeeper restart
+          systemd:
+            name: zookeeper
+            state: restarted

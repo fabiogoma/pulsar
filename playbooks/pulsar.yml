@@ -1,0 +1,59 @@
+---
+    - name: Apache pulsar install
+      hosts: all:!localhost
+      gather_facts: false
+    
+      tasks:
+        - name: Put SELinux in permissive mode, logging actions that would be blocked.
+          selinux:
+            policy: targeted
+            state: permissive
+        
+        - name: Update /etc/hosts
+          copy:
+            src: files/etc/hosts
+            dest: /etc/hosts
+            owner: root
+            group: root
+            mode: 0644
+
+        - name: Upgrade all packages
+          yum:
+            name: '*'
+            state: latest
+
+        - name: Install dependencies
+          yum:
+            name:
+              - java-1.6.0-openjdk
+              - java-1.8.0-openjdk-devel
+              - wget
+              - mlocate
+
+        - name: Install Stream Native RPM
+          yum:
+            name: http://repo.europe.intranet/streamnative/sn-platform-1.0.0-1.x86_64.rpm
+
+        - name: Ensure group "streamnative" exists
+          group:
+            name: streamnative
+            state: present
+            system: true
+        
+        - name: Add the user 'pulsar' with a primary group of 'streamnative'
+          user:
+            name: pulsar
+            group: streamnative
+            system: true
+        
+        - name: Change folder ownership recursively
+          file:
+            dest: /sn-platform-pulsar
+            owner: pulsar
+            group: streamnative
+            recurse: true
+
+        - name: Conditional role
+          include_role:
+            name: zookeeper
+          when: "'zookeeper' in group_names"
