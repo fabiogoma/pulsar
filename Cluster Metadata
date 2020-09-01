@@ -1,6 +1,14 @@
+su - pulsar
+cd /sn-platform-pulsar/bin
+
 ./pulsar initialize-cluster-metadata \
   --cluster pulsar-cluster-1 \
   --zookeeper zookeeper-1.europe.intranet:2181 \
   --configuration-store zookeeper-1.europe.intranet:2181 \
   --web-service-url http://pulsar.europe.intranet:8080 \
   --broker-service-url pulsar://pulsar.europe.intranet:6650
+
+  ./bookkeeper shell simpletest --ensemble 3 --writeQuorum 2 --ackQuorum 2 --numEntries 100
+
+  (optional)
+  ./bookkeeper autorecovery
