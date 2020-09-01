@@ -62,3 +62,8 @@
           include_role:
             name: bookkeeper
           when: "'bookkeeper' in group_names"
+        
+        - name: Conditional role for broker
+          include_role:
+            name: broker
+          when: "'broker' in group_names"

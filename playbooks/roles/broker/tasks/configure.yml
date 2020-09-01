@@ -1,0 +1,43 @@
+---
+    - name: Setup broker
+      template:
+        src: broker.conf.j2
+        dest: /sn-platform-pulsar/etc/pulsar/broker.conf
+        owner: pulsar
+        group: streamnative
+        mode: 0644
+
+    - name: Update ExecStart on systemd file
+      lineinfile:
+        path: /sn-platform-pulsar/lib/systemd/system/pulsar-broker.service
+        regexp: '^ExecStart=/bin/pulsar broker'
+        line: ExecStart=/sn-platform-pulsar/bin/pulsar broker
+      register: systemd_update
+
+    - name: Add WorkingDirectory to systemd file
+      lineinfile:
+        path: /sn-platform-pulsar/lib/systemd/system/pulsar-broker.service
+        insertafter: '^Group=streamnative'
+        line: WorkingDirectory=/sn-platform-pulsar/bin
+      register: systemd_update
+
+    - name: Create a symbolic link
+      file:
+        src: /sn-platform-pulsar/lib/systemd/system/pulsar-broker.service
+        dest: /etc/systemd/system/pulsar-broker.service
+        state: link
+      register: systemd_update
+
+    - name: Restart service broker, also issue daemon-reload to pick up config changes
+      systemd:
+        name: pulsar-broker
+        state: restarted
+        daemon_reload: yes
+      when: systemd_update.changed
+
+    - name: Ensure broker is running
+      systemd:
+        name: pulsar-broker
+        state: started
+        enabled: true
+        daemon_reload: yes
