@@ -53,7 +53,12 @@
             group: streamnative
             recurse: true
 
-        - name: Conditional role
+        - name: Conditional role for zookeeper
           include_role:
             name: zookeeper
           when: "'zookeeper' in group_names"
+
+        - name: Conditional role for bookkeeper
+          include_role:
+            name: bookkeeper
+          when: "'bookkeeper' in group_names"

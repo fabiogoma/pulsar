@@ -1,0 +1,3 @@
+---
+# tasks file for bookkeeper
+- import_tasks: configure.yml

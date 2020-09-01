@@ -1,0 +1,50 @@
+---
+    - name: Setup bookkeeper
+      template:
+        src: bookkeeper.conf.j2
+        dest: /sn-platform-pulsar/etc/pulsar/bookkeeper.conf
+        owner: pulsar
+        group: streamnative
+        mode: 0644
+
+    - name: Update User on systemd file
+      lineinfile:
+        path: /sn-platform-pulsar/lib/systemd/system/bookkeeper.service
+        regexp: '^User=bookkeeper'
+        line: User=pulsar
+      register: systemd_update
+
+    - name: Update ExecStart on systemd file
+      lineinfile:
+        path: /sn-platform-pulsar/lib/systemd/system/bookkeeper.service
+        regexp: '^ExecStart=/bin/bookkeeper bookie'
+        line: ExecStart=/sn-platform-pulsar/bin/bookkeeper bookie
+      register: systemd_update
+
+    - name: Add WorkingDirectory to systemd file
+      lineinfile:
+        path: /sn-platform-pulsar/lib/systemd/system/bookkeeper.service
+        insertafter: '^Group=streamnative'
+        line: WorkingDirectory=/sn-platform-pulsar/bin
+      register: systemd_update
+    
+    - name: Create a symbolic link
+      file:
+        src: /sn-platform-pulsar/lib/systemd/system/bookkeeper.service
+        dest: /etc/systemd/system/bookkeeper.service
+        state: link
+      register: systemd_update
+    
+    - name: Restart service bookkeeper, also issue daemon-reload to pick up config changes
+      systemd:
+        name: bookkeeper
+        state: restarted
+        daemon_reload: yes
+      when: systemd_update.changed
+    
+    - name: Ensure bookkeeper is running
+      systemd:
+        name: bookkeeper
+        state: started
+        enabled: true
+        daemon_reload: yes
