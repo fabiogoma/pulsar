@@ -12,3 +12,9 @@ cd /sn-platform-pulsar/bin
 
   (optional)
   ./bookkeeper autorecovery
+
+Producer:
+pulsar-client produce persistent://public/default/test -n 1 -m "Hello Pulsar"
+
+Consumer:
+pulsar-client consume persistent://public/default/test -n 100 -s "consumer-test" -t "Exclusive"
