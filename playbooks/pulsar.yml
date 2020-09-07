@@ -2,13 +2,13 @@
     - name: Apache pulsar install
       hosts: all:!localhost
       gather_facts: false
-    
+
       tasks:
         - name: Put SELinux in permissive mode, logging actions that would be blocked.
           selinux:
             policy: targeted
             state: permissive
-        
+
         - name: Update /etc/hosts
           copy:
             src: files/etc/hosts
@@ -39,13 +39,13 @@
             name: streamnative
             state: present
             system: true
-        
+
         - name: Add the user 'pulsar' with a primary group of 'streamnative'
           user:
             name: pulsar
             group: streamnative
             system: true
-        
+
         - name: Change folder ownership recursively
           file:
             dest: /sn-platform-pulsar
@@ -62,8 +62,18 @@
           include_role:
             name: bookkeeper
           when: "'bookkeeper' in group_names"
-        
+
         - name: Conditional role for broker
           include_role:
             name: broker
           when: "'broker' in group_names"
+
+        - name: Conditional role for control
+          include_role:
+            name: control
+          when: "'control' in group_names"
+        
+        - name: Conditional role for client
+          include_role:
+            name: client
+          when: "'client' in group_names"
