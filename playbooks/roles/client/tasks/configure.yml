@@ -1,0 +1,43 @@
+---
+    - name: Install python 3.6 virtualenv packages
+      yum:
+        name: python36-virtualenv
+        state: latest
+
+    - name: Copy scripts
+      copy:
+        src: "files/client/requirements.txt"
+        dest: "/tmp/requirements.txt"
+        owner: pulsar
+        group: streamnative
+        mode: 0644
+
+    - name: Create new virtualenv
+      pip:
+        requirements: /tmp/requirements.txt
+        virtualenv: /sn-platform-pulsar/client
+        virtualenv_command: virtualenv-3.6
+      become: true
+      become_user: pulsar
+
+    - name: Create a folder to keep the scripts
+      file:
+        path: /sn-platform-pulsar/client/scripts
+        state: directory
+        recurse: true
+        owner: pulsar
+        group: streamnative
+        mode: 0755
+
+    - name: Copy scripts
+      copy:
+        src: "files/client/{{ item }}"
+        dest: "/sn-platform-pulsar/client/scripts/{{ item }}"
+        owner: pulsar
+        group: streamnative
+        mode: 0644
+      loop:
+       - consumer.py
+       - producer.py
+
+
