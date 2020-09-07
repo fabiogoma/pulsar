@@ -1,0 +1,23 @@
+---
+    - name: Zookeeper restart
+      hosts: all
+      gather_facts: false
+    
+      tasks:
+        - name: Zookeeper restart
+          systemd:
+            name: zookeeper
+            state: started
+          when: "'zookeeper' in group_names"
+        
+        - name: BookKeeper start
+          systemd:
+            name: bookkeeper
+            state: started
+          when: "'bookkeeper' in group_names"
+        
+        - name: Broker start
+          systemd:
+            name: pulsar-broker
+            state: started
+          when: "'broker' in group_names"
