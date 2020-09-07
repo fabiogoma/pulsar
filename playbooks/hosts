@@ -1,18 +1,5 @@
 [all]
 localhost   ansible_connection=local
-zookeeper-1.europe.intranet
-zookeeper-2.europe.intranet
-zookeeper-3.europe.intranet
-bookkeeper-1.europe.intranet
-bookkeeper-2.europe.intranet
-bookkeeper-3.europe.intranet
-broker-1.europe.intranet
-broker-2.europe.intranet
-broker-3.europe.intranet
-proxy-1.europe.intranet
-proxy-2.europe.intranet
-proxy-3.europe.intranet
-pulsar.europe.intranet
 
 [zookeeper]
 zookeeper-1.europe.intranet
@@ -29,10 +16,9 @@ broker-1.europe.intranet
 broker-2.europe.intranet
 broker-3.europe.intranet
 
-[proxy]
-proxy-1.europe.intranet
-proxy-2.europe.intranet
-proxy-3.europe.intranet
+[client]
+producer.europe.intranet
+consumer.europe.intranet
 
 [control]
 pulsar.europe.intranet
