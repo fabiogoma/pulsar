@@ -39,5 +39,6 @@
       loop:
        - consumer.py
        - producer.py
+       - config.ini
 
 
