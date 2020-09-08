@@ -22,9 +22,9 @@ if __name__ == '__main__':
     topic_name  = config['default'].get('topic_name')
     messages_per_second = config['default'].getint('messages_per_second')
 
-    client = pulsar.Client(broker_address)
+    client = pulsar.Client(service_url=broker_address, operation_timeout_seconds=500)
 
-    consumer = client.subscribe(topic_name, 'python-subscription')
+    consumer = client.subscribe(topic=topic_name, subscription_name='python-subscription', consumer_type=pulsar._pulsar.ConsumerType.Failover)
 
     while True:
         msg = consumer.receive()

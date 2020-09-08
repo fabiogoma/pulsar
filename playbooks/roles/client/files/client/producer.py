@@ -25,12 +25,18 @@ if __name__ == '__main__':
     topic_name  = config['default'].get('topic_name')
     messages_per_second = config['default'].getint('messages_per_second')
 
-    client = pulsar.Client(broker_address)
-    producer = client.create_producer(topic_name)
+    client = pulsar.Client(service_url=broker_address, operation_timeout_seconds=500)
+    producer = client.create_producer(topic=topic_name, send_timeout_millis=500000, max_pending_messages=10000)
 
     while True:
         for i in range(messages_per_second):
-            producer.send(str(uuid.uuid4()).encode('utf-8'))
+            try:
+                producer.send(str(uuid.uuid4()).encode('utf-8'))
+            except KeyboardInterrupt:
+                print("Exiting gracefully. {} messages sent".format(str(counter * messages_per_second)))
+                sys.exit()
+            except:
+                print('Message send failure')
         time.sleep(1)
         counter += 1
 
