@@ -41,6 +41,3 @@
        - producer.py
        - config.ini
        - send_one.py
-       - counter.py
-
-

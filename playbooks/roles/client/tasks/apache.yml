@@ -1,0 +1,57 @@
+
+---
+    - name: install the 'Web Server' package group
+      yum:
+        name:
+         - "@Web Server"
+         - mod_wsgi
+        state: present
+
+    - name: Copy scripts
+      copy:
+        src: "files/client/counter/counter.conf"
+        dest: "/etc/httpd/conf.d/counter.conf"
+        owner: root
+        group: root
+        mode: 0644
+      register: systemd_update
+
+    - name: Create new virtualenv
+      pip:
+        requirements: /tmp/requirements.txt
+        virtualenv: /var/www/counter
+        virtualenv_command: virtualenv-3.6
+
+    - name: Create a folder to keep the scripts
+      file:
+        path: /var/www/counter/app
+        state: directory
+        recurse: true
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Copy scripts
+      copy:
+        src: "files/client/counter/{{ item }}"
+        dest: "/var/www/counter/{{ item }}"
+        mode: 0644
+      loop:
+       - run.py
+       - wsgi.py
+       - app/__init__.py
+      register: systemd_update
+    
+    - name: Restart Apache, also issue daemon-reload to pick up config changes
+      systemd:
+        name: httpd
+        state: restarted
+        daemon_reload: yes
+      when: systemd_update.changed
+    
+    - name: Ensure Apache is running
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+        daemon_reload: yes

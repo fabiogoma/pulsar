@@ -1,3 +1,6 @@
 ---
 # tasks file for client
 - import_tasks: configure.yml
+
+- import_tasks: apache.yml
+  when: "'counter' in inventory_hostname"

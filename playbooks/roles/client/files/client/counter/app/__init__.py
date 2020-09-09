@@ -48,6 +48,3 @@ def reset_message():
     total_message_dict = { "total_published": total_published, "total_consumed": total_consumed }
 
     return jsonify(total_messages=total_message_dict)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='8080', debug=True)
