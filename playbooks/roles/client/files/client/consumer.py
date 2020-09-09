@@ -4,11 +4,11 @@ import signal
 import configparser
 import os
 import datetime
-
-counter = 0
+import requests
 
 def terminateProcess(signalNumber, frame):
-    print("\nExiting gracefully. {} messages were succesfully consumed".format(str(counter)))
+    print("")
+    print("Exiting gracefully")
     sys.exit()
 
 if __name__ == '__main__':
@@ -21,6 +21,7 @@ if __name__ == '__main__':
     broker_address = config['default'].get('broker_address')
     topic_name  = config['default'].get('topic_name')
     messages_per_second = config['default'].getint('messages_per_second')
+    counter_url = "{}/counter/out".format(config['default'].get('counter_url'))
 
     client = pulsar.Client(service_url=broker_address, operation_timeout_seconds=500)
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
             print("Received message data='{}' publish_time='{}'".format(msg.data().decode('utf-8'), datetime.datetime.fromtimestamp(msg.publish_timestamp() / 1000.0)))
             # Acknowledge successful processing of the message
             consumer.acknowledge(msg)
-            counter += 1
+            requests.put(counter_url)
         except:
             # Message failed to be processed
             consumer.negative_acknowledge(msg)

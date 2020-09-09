@@ -19,6 +19,7 @@ broker-3.europe.intranet
 [client]
 producer.europe.intranet
 consumer.europe.intranet
+counter.europe.intranet
 
 [control]
 pulsar.europe.intranet
