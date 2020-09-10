@@ -3,9 +3,6 @@ from pymemcache.client import base
 
 client = base.Client(('counter.europe.intranet', 11211))
 
-client.set('published', '0')
-client.set('consumed', '0')
-
 app = Flask(__name__)
 
 @app.route('/counter/in', methods=['PUT'])
