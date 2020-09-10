@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     client = pulsar.Client(service_url=broker_address, operation_timeout_seconds=500)
 
-    consumer = client.subscribe(topic=topic_name, subscription_name='python-subscription', consumer_type=pulsar._pulsar.ConsumerType.Failover)
+    consumer = client.subscribe(topic=topic_name, subscription_name='python-subscription', consumer_type=pulsar._pulsar.ConsumerType.Shared)
 
     while True:
         msg = consumer.receive()
