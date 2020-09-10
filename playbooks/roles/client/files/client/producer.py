@@ -25,8 +25,8 @@ if __name__ == '__main__':
     counter_url = "{}/counter/in".format(config['default'].get('counter_url'))
 
     client = pulsar.Client(service_url=broker_address, operation_timeout_seconds=500)
-    producer = client.create_producer(topic=topic_name, send_timeout_millis=500000, max_pending_messages=10000)
-    
+    producer = client.create_producer(topic=topic_name, send_timeout_millis=0, producer_name="python-producer", max_pending_messages=10000)
+
     while True:
         for i in range(messages_per_second):
             producer.send(str(uuid.uuid4()).encode('utf-8'))
