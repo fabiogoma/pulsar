@@ -2,6 +2,7 @@ import pulsar
 import uuid
 import configparser
 import os
+import requests
 
 config = configparser.ConfigParser()
 config.read_file(open("{}/config.ini".format(os.path.dirname(__file__))))
