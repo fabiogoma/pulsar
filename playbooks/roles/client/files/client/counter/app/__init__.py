@@ -1,22 +1,23 @@
 from flask import Flask, jsonify
-from multiprocessing import Value
+from pymemcache.client import base
 
-published = Value('i', 0)
-consumed = Value('i', 0)
+client = base.Client(('counter.europe.intranet', 11211))
+
+client.set('published', '0')
+client.set('consumed', '0')
+
 app = Flask(__name__)
 
 @app.route('/counter/in', methods=['PUT'])
 def published_message():
-    with published.get_lock():
-        published.value += 1
-        out = published.value
+    client.incr('published', 1)
+    out = int(client.get('published').decode('utf-8'))
     return jsonify(total_published=out)
 
 @app.route('/counter/out', methods=['PUT'])
 def consumed_message():
-    with consumed.get_lock():
-        consumed.value += 1
-        out = consumed.value
+    client.incr('consumed', 1)
+    out = int(client.get('consumed').decode('utf-8'))
     return jsonify(total_consumed=out)
 
 @app.route('/counter/total', methods=['GET'])
@@ -24,11 +25,8 @@ def total_message():
     total_published = 0
     total_consumed = 0
 
-    with published.get_lock():
-        total_published = published.value
-
-    with consumed.get_lock():
-        total_consumed = consumed.value
+    total_published = int(client.get('published').decode('utf-8'))
+    total_consumed = int(client.get('consumed').decode('utf-8'))
 
     total_message_dict = { "total_published": total_published, "total_consumed": total_consumed }
 
@@ -36,14 +34,11 @@ def total_message():
 
 @app.route('/counter/reset', methods=['POST'])
 def reset_message():
-    total_published = 0
-    total_consumed = 0
+    client.set('published', '0')
+    client.set('consumed', '0')
 
-    with published.get_lock():
-        published.value = total_published
-
-    with consumed.get_lock():
-        consumed.value = total_consumed
+    total_published = int(client.get('published').decode('utf-8'))
+    total_consumed = int(client.get('consumed').decode('utf-8'))
 
     total_message_dict = { "total_published": total_published, "total_consumed": total_consumed }
 

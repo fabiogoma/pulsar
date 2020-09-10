@@ -1,11 +1,19 @@
 
 ---
-    - name: install the 'Web Server' package group
+    - name: install the 'Web Server' package group, WSGI and Memcache
       yum:
         name:
          - "@Web Server"
          - mod_wsgi
+         - memcached
         state: present
+
+    - name: Update ExecStart on systemd file
+      lineinfile:
+        path: /etc/sysconfig/memcached
+        regexp: '^CACHESIZE="64"'
+        line: 'CACHESIZE="1GB"'
+      register: systemd_update
 
     - name: Copy scripts
       copy:
@@ -42,16 +50,22 @@
        - app/__init__.py
       register: systemd_update
     
-    - name: Restart Apache, also issue daemon-reload to pick up config changes
+    - name: Restart Apache and Memcache, also issue daemon-reload to pick up config changes
       systemd:
-        name: httpd
+        name: "{{ item }}"
         state: restarted
         daemon_reload: yes
+      loop:
+       - httpd
+       - memcached
       when: systemd_update.changed
-    
-    - name: Ensure Apache is running
+
+    - name: Ensure Apache and Memcache are running
       systemd:
-        name: httpd
+        name: "{{ item }}"
         state: started
         enabled: true
         daemon_reload: yes
+      loop:
+       - httpd
+       - memcached
