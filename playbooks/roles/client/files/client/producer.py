@@ -7,6 +7,12 @@ import configparser
 import os
 import requests
 
+counter_url = ''
+
+def callback(res, msg_id):
+    if 'Ok' ==  pulsar._pulsar.Result.Ok:
+        requests.put(counter_url)
+
 def terminateProcess(signalNumber, frame):
     print()
     print("Exiting gracefully.")
@@ -29,8 +35,7 @@ if __name__ == '__main__':
 
     while True:
         for i in range(messages_per_second):
-            producer.send(str(uuid.uuid4()).encode('utf-8'))
-            requests.put(counter_url)
+            producer.send_async(str(uuid.uuid4()).encode('utf-8'), callback)
         time.sleep(1)
 
     client.close()
