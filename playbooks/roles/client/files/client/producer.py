@@ -10,7 +10,7 @@ import requests
 counter_url = ''
 
 def callback(res, msg_id):
-    if 'Ok' ==  pulsar._pulsar.Result.Ok:
+    if res == pulsar._pulsar.Result.Ok:
         requests.put(counter_url)
 
 def terminateProcess(signalNumber, frame):
