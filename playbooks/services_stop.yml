@@ -1,22 +1,22 @@
 ---
-    - name: Zookeeper restart
+    - name: Services stop
       hosts: all
       gather_facts: false
     
       tasks:
-        - name: Zookeeper restart
+        - name: Zookeeper stop
           systemd:
             name: zookeeper
             state: stopped
           when: "'zookeeper' in group_names"
         
-        - name: BookKeeper start
+        - name: BookKeeper stop
           systemd:
             name: bookkeeper
             state: stopped
           when: "'bookkeeper' in group_names"
         
-        - name: Broker start
+        - name: Broker stop
           systemd:
             name: pulsar-broker
             state: stopped

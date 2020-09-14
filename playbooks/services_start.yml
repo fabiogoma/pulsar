@@ -1,10 +1,10 @@
 ---
-    - name: Zookeeper restart
+    - name: Services start
       hosts: all
       gather_facts: false
     
       tasks:
-        - name: Zookeeper restart
+        - name: Zookeeper start
           systemd:
             name: zookeeper
             state: started

@@ -1,0 +1,40 @@
+---
+    - name: BookKeeper Cleanup
+      hosts: bookkeeper:zookeeper
+      gather_facts: false
+    
+      tasks:
+        - name: BookKeeper stop
+          systemd:
+            name: bookkeeper
+            state: stopped
+          when: "'bookkeeper' in group_names"
+
+        - name: Remove data folder
+          file:
+            path: "/sn-platform-pulsar/data/bookkeeper"
+            state: absent
+          when: "'bookkeeper' in group_names"
+        
+        # - name: Cleanup zookeeper
+        #   znode:
+        #     hosts: "{{ groups['zookeeper'] | random }}:2181"
+        #     name: "/{{ item }}"
+        #     op: deleteall
+        #   loop:
+        #    - admin
+        #    - bookies
+        #    - ledgers
+        #    - loadbalance
+        #    - managed-ledgers
+        #    - namespace
+        #    - stream
+        #    - zookeeper
+        #   run_once: true
+        #   when: "'zookeeper' in group_names"
+
+        # - name: BookKeeper start
+        #   systemd:
+        #     name: bookkeeper
+        #     state: started
+        #   when: "'bookkeeper' in group_names"
