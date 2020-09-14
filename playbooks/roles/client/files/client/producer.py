@@ -6,12 +6,36 @@ import time
 import configparser
 import os
 import requests
+import logging
+import sys
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+log_format = "%(asctime)s.%(msecs)03d %(levelname)s  [%(thread)d] %(funcName)s:%(lineno)d | %(message)s"
+date_format = "%Y-%m-%d %H:%M:%S"
+formatter = logging.Formatter(fmt=log_format, datefmt=date_format)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 counter_url = ''
 
-def callback(res, msg_id):
+def Callback(res, msg_id):
     if res == pulsar._pulsar.Result.Ok:
-        requests.put(counter_url)
+        try:
+            requests.put(counter_url)
+        except OSError as osError:
+            logger.info("OS Error: {0}".format(osError))
+        except requests.exceptions.HTTPError as httpError:
+            logger.info("Http Error: {0}".format(httpError))
+        except requests.exceptions.Timeout as timeout:
+            logger.info("Timeout Error: {0}".format(timeout))
+        except requests.exceptions.ConnectionError as connectionError:
+            logger.info("Connection Error: {0}".format(connectionError))
+        except requests.exceptions.RequestException as requestException:
+            logger.info("Request Exception: {0}".format(requestException))
 
 def terminateProcess(signalNumber, frame):
     print()
@@ -35,7 +59,7 @@ if __name__ == '__main__':
 
     while True:
         for i in range(messages_per_second):
-            producer.send_async(str(uuid.uuid4()).encode('utf-8'), callback)
+            producer.send_async(str(uuid.uuid4()).encode('utf-8'), Callback)
         time.sleep(1)
 
     client.close()

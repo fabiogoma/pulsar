@@ -5,6 +5,19 @@ import configparser
 import os
 import datetime
 import requests
+import logging
+import sys
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+log_format = "%(asctime)s.%(msecs)03d %(levelname)s  [%(thread)d] %(funcName)s:%(lineno)d | %(message)s"
+date_format = "%Y-%m-%d %H:%M:%S"
+formatter = logging.Formatter(fmt=log_format, datefmt=date_format)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 def terminateProcess(signalNumber, frame):
     print("")
@@ -33,7 +46,18 @@ if __name__ == '__main__':
             print("Received message data='{}' publish_time='{}'".format(msg.data().decode('utf-8'), datetime.datetime.fromtimestamp(msg.publish_timestamp() / 1000.0)))
             # Acknowledge successful processing of the message
             consumer.acknowledge(msg)
-            requests.put(counter_url)
+            try:
+                requests.put(counter_url)
+            except OSError as osError:
+                logger.info("OS Error: {0}".format(osError))
+            except requests.exceptions.HTTPError as httpError:
+                logger.info("Http Error: {0}".format(httpError))
+            except requests.exceptions.Timeout as timeout:
+                logger.info("Timeout Error: {0}".format(timeout))
+            except requests.exceptions.ConnectionError as connectionError:
+                logger.info("Connection Error: {0}".format(connectionError))
+            except requests.exceptions.RequestException as requestException:
+                logger.info("Request Exception: {0}".format(requestException))
         except:
             # Message failed to be processed
             consumer.negative_acknowledge(msg)
