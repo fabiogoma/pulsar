@@ -13,6 +13,9 @@ def published_message():
         out = int(client.get('published').decode('utf-8'))
     except OSError as err:
         out = { "Error": "OS error: {0}".format(err) }
+    except AttributeError as err:
+        client.set('published', '1')
+        out = int(client.get('published').decode('utf-8'))
 
     return jsonify(total_published=out)
 
@@ -24,6 +27,9 @@ def consumed_message():
         out = int(client.get('consumed').decode('utf-8'))
     except OSError as err:
         out = { "Error": "OS error: {0}".format(err) }
+    except AttributeError as err:
+        client.set('consumed', '1')
+        out = int(client.get('consumed').decode('utf-8'))
 
     return jsonify(total_consumed=out)
 
