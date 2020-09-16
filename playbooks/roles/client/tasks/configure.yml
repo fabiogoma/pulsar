@@ -39,5 +39,6 @@
       loop:
        - consumer.py
        - producer.py
+       - utils.py
        - config.ini
        - send_one.py
