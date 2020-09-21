@@ -19,7 +19,6 @@ if __name__ == '__main__':
 
     broker_address = config['default'].get('broker_address')
     topic_name  = config['default'].get('topic_name')
-    messages_per_second = config['default'].getint('messages_per_second')
     counter_url = "{}/counter/out".format(config['default'].get('counter_url'))
 
     client = pulsar.Client(service_url=broker_address, operation_timeout_seconds=500)
